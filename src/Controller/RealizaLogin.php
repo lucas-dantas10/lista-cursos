@@ -24,8 +24,10 @@ class RealizaLogin extends ControllerComHtml implements InterfaceControladorRequ
         );
 
         if ($email === false || is_null($email)) {
-            echo 'O E-mail digitado não é válido';
-            exit();
+            $_SESSION['tipo_mensagem'] = 'danger';
+            $_SESSION['mensagem'] = 'O e-mail digitado não é um e-mail válido.';
+            header('Location: /login');
+            return;
         }
 
         $senha = filter_input(INPUT_POST,
@@ -38,8 +40,10 @@ class RealizaLogin extends ControllerComHtml implements InterfaceControladorRequ
         ]);
 
         if (is_null($usuario) || !$usuario->senhaEstaCorreta($senha)) {
-            echo 'E-mail ou senha inválidos';
-            exit();
+            $_SESSION['tipo_mensagem'] = 'danger';
+            $_SESSION['mensagem'] = 'E-mail ou senha inválidos';
+            header('Location: /login');
+            die();
         }
         
         $_SESSION['logado'] = true; 
