@@ -5,8 +5,12 @@ namespace Alura\Cursos\Controller;
 use Alura\Cursos\Entity\Curso;
 use Alura\Cursos\Helper\FlashMessageTrait;
 use Alura\Cursos\Infra\EntityManagerCreator;
+use Nyholm\Psr7\Response;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
-class Persistencia implements InterfaceControladorRequisicao
+class Persistencia implements RequestHandlerInterface
 {
     use FlashMessageTrait;
 
@@ -17,15 +21,11 @@ class Persistencia implements InterfaceControladorRequisicao
         $this->entityManager = EntityManagerCreator::getEntityManager();
     }
 
-    public function processaRequisicao(): void
-    {
+    public function handle(ServerRequestInterface $request): ResponseInterface
+    {       
         $curso = new Curso();
         $curso->setDescricao($_POST['descricao']);
-        $id = filter_input(
-            INPUT_GET,
-            'id',
-            FILTER_VALIDATE_INT
-        );
+        $id = $request->getQueryParams()['id'];
 
         $tipo = 'success';
         if (!is_null($id) && $id !== false) {
@@ -38,7 +38,7 @@ class Persistencia implements InterfaceControladorRequisicao
         }
         
         $this->entityManager->flush();
-
-        header("Location: /listar-cursos", true, 302);
+        
+        return new Response(200, ['Location' => '/listar-cursos']);
     }
 }
